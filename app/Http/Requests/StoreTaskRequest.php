@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class StoreTaskRequest extends FormRequest
 {
@@ -24,6 +26,12 @@ class StoreTaskRequest extends FormRequest
         return [
             //
             'title' => 'required|max:255',
+            'project_id' => [
+                'nullable',
+                Rule::exists('projects', 'id')->where(function ($query) {
+                    $query->where('creator_id', Auth::id());
+                }),
+            ],
         ];
     }
 }
