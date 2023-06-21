@@ -13,6 +13,9 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class ProjectController extends Controller
 {
+    public function __construct(){
+        $this->authorizeResource(Project::class,'project');
+    }
     public function index(Request $request)
     {
 
@@ -36,7 +39,9 @@ class ProjectController extends Controller
 
     public function show(Request $request, Project $project)
     {
-        return (new ProjectResource($project))->load('tasks')->load('members');
+        return (new ProjectResource($project))
+        ->load('tasks')
+        ->load('members');
     }
 
     public function update(UpdateProjectRequest $request, Project $project)
