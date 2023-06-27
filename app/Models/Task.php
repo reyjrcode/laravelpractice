@@ -6,6 +6,7 @@ use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Auth;
 
 class Task extends Model
@@ -28,11 +29,16 @@ class Task extends Model
         return $this->belongsTo(Project::class);
     }
 
+    public function comments(): MorphMany
+    {
+        return $this->morphMany(Comment::class, 'commentable');
+    }
+
     protected static function booted(): void
     {
         static::addGlobalScope('member', function (Builder $builder) {
             $builder->where('creator_id', Auth::id())
-            ->orWhereIn('project_id',Auth::user()->memberships->pluck('id'));
+                ->orWhereIn('project_id', Auth::user()->memberships->pluck('id'));
         });
     }
 }
