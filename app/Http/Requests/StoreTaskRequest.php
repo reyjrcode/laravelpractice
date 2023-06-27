@@ -26,6 +26,8 @@ class StoreTaskRequest extends FormRequest
         return [
             //
             'title' => 'required|max:255',
+            'schedule_at' => 'nullable|date',
+            'due_at' => 'nullable|date',
             'project_id' => [
                 'nullable',
                 Rule::in(Auth::user()->memberships->pluck('id')),

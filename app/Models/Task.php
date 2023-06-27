@@ -9,11 +9,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Auth;
 
+
 class Task extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'is_done', 'project_id',];
+    protected $fillable = ['title', 'is_done', 'project_id', 'schedule_at', 'due_at',];
 
     protected $casts = ['is_done' => 'boolean'];
 
@@ -28,10 +29,28 @@ class Task extends Model
     {
         return $this->belongsTo(Project::class);
     }
+    public function scopeScheduledBetween(Builder $query, string $fromDate, string $toDate)
+    {
+        $query->where('scheduled_at', '>=', $fromDate)->where('scheduled_at', '<=', $toDate);
+    }
+
+    public function scopeDueBetween(Builder $query, string $fromDate, string $toDate)
+    {
+        $query->where('due_at', '>=', $fromDate)->where('due_at', '<=', $toDate);
+    }
+
 
     public function comments(): MorphMany
     {
         return $this->morphMany(Comment::class, 'commentable');
+    }
+    public function scopeDue(Builder $query, string $filter)
+    {
+        if ($filter === 'today') {
+            $query->where('due_at', '=', Carbon::today()->toDateString());
+        } elseif ($filter === 'past') {
+            $query->where('due_at', '<', Carbon::today()->toDateString());
+        }
     }
 
     protected static function booted(): void
